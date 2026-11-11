@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { prisma } from "@/database/prisma";
 import { z } from "zod";
 import { AppError } from "@/utils/app-error";
+import { json } from "stream/consumers";
 
 class DeliveryLogsController {
   async create(request: Request, response: Response) {
@@ -52,6 +53,10 @@ class DeliveryLogsController {
         logs: { select: { description: true } },
       },
     });
+
+    if (!delivery) {
+      return response.status(404).json({ message: "delivery not found" });
+    }
 
     if (
       request.user?.role == "customer" &&
